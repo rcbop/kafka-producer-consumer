@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.2.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+
+  kafka:
+    image: confluentinc/cp-kafka:6.2.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+
+  producer:
+    build:
+      context: producer
+      dockerfile: Dockerfile
+    container_name: producer
+    depends_on:
+      - kafka
+
+  consumer:
+    build:
+      context: consumer
+      dockerfile: Dockerfile
+    container_name: consumer
+    depends_on:
+      - kafka
